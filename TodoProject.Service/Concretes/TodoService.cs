@@ -42,6 +42,20 @@ public sealed class TodoService : ITodoService
         };
     }
 
+    public ReturnModel<string> Delete(Guid id)
+    {
+        Todo? todo = _todoRepository.GetById(id);
+        Todo deletedTodo = _todoRepository.Delete(todo);
+
+        return new ReturnModel<string>
+        {
+            Data = $"Todo Başlığı : {deletedTodo.Title}",
+            Message = "Silindi",
+            Status = 204,
+            Success = true
+        };
+    }
+
     public ReturnModel<List<TodoResponseDto>> GetAll()
     {
         List<Todo> todos = _todoRepository.GetAll();
@@ -78,6 +92,31 @@ public sealed class TodoService : ITodoService
         {
             Data = response,
             Message = "Görev başarıyla getirildi",
+            Status = 200,
+            Success = true
+        };
+    }
+
+    public ReturnModel<TodoResponseDto> Update(UpdatedTodoRequestDto dto)
+    {
+
+        Todo todo = _todoRepository.GetById(dto.Id);
+
+        todo.Title = dto.Title;
+        todo.Description = dto.Description;
+        todo.Priority = dto.Priority;
+        todo.CategoryId = dto.CategoryId;
+        todo.CreatedDate = DateTime.Now;
+      
+
+        _todoRepository.Update(todo);
+
+        TodoResponseDto response = _mapper.Map<TodoResponseDto>(todo);
+
+        return new ReturnModel<TodoResponseDto>
+        {
+            Data = response,
+            Message = "Todo Güncellendi.",
             Status = 200,
             Success = true
         };
